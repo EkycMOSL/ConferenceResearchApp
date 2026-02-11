@@ -1,3 +1,5 @@
+import 'package:conferance_application/features/dashboard/cubit/dashboard_cubit.dart';
+import 'package:conferance_application/features/dashboard/presentation/dashboard_screen.dart';
 import 'package:conferance_application/features/login_screen/cubit/login_screen_cubit.dart';
 import 'package:conferance_application/features/login_screen/presentation/login_screen.dart';
 import 'package:conferance_application/utils/locator.dart';
@@ -121,10 +123,10 @@ class _MyHomePageState extends State<MyHomePage> {
     return MultiProvider(
       providers: [
         BlocProvider(
-          create: (_) => LoginScreenCubit(),
+          create: (_) => DashboardCubit(),
         ),
       ],
-      child: const LoginScreenScreen(),
+      child: const DashboardScreen(),
     );;
   }
 }
