@@ -1,7 +1,7 @@
-import 'package:conferance_application/features/dashboard/cubit/dashboard_cubit.dart';
-import 'package:conferance_application/features/dashboard/presentation/dashboard_screen.dart';
 import 'package:conferance_application/features/login_screen/cubit/login_screen_cubit.dart';
 import 'package:conferance_application/features/login_screen/presentation/login_screen.dart';
+import 'package:conferance_application/features/splash_screen/cubit/splash_cubit.dart';
+import 'package:conferance_application/features/splash_screen/presentation/splash_screen.dart';
 import 'package:conferance_application/utils/locator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -123,10 +123,10 @@ class _MyHomePageState extends State<MyHomePage> {
     return MultiProvider(
       providers: [
         BlocProvider(
-          create: (_) => DashboardCubit(),
+          create: (_) => SplashCubit(),
         ),
       ],
-      child: const DashboardScreen(),
-    );;
+      child: const SplashScreen(),
+    );
   }
 }

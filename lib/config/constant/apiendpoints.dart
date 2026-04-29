@@ -1,5 +1,4 @@
 class ApiEndpoints {
-  static const String uatbaseUrl = "https://ekycuat.motilaloswaluat.com/DIYEKYC/api/v4/";
-  static const String pilotEndPoint = "https://ekyc.motilaloswal.com/open-demat-account/api/v3/";
-
+  static const String baseUrl = "https://agic.motilaloswal.com/AGIC_MobileAPI/api/";
+  static const String getAnalystSchedule = "GetAnalystSchedule";
 }

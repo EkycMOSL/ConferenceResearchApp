@@ -15,7 +15,6 @@ class ConstantStatic{
   static Widget? loginPageName;
 
   // API URLs (auto computed)
-  static String get baseUrl =>
-      isUat ? ApiEndpoints.uatbaseUrl : ApiEndpoints.pilotEndPoint;
+  static String get baseUrl => ApiEndpoints.baseUrl;
 
 }

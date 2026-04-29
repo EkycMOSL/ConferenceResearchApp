@@ -19,3 +19,11 @@ class LoginScreenError extends LoginScreenState {
   @override
   List<Object?> get props => [message];
 }
+
+class AnalystScheduleSuccess extends LoginScreenState {
+  final String message;
+  const AnalystScheduleSuccess(this.message);
+  @override
+  List<Object?> get props => [message];
+}
+
