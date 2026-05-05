@@ -1,3 +1,8 @@
+import 'package:conferance_application/config/appConfigUtils/local_storage_key.dart';
+import 'package:conferance_application/config/appConfigUtils/localstorage.dart';
+import 'package:conferance_application/data/models/dashboard/corporate_response_model.dart';
+import 'package:conferance_application/data/models/dashboard/dashboard_response_model.dart';
+import 'package:conferance_application/features/login_screen/presentation/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -5,12 +10,15 @@ import '../cubit/dashboard_cubit.dart';
 import '../cubit/dashboard_state.dart';
 
 class DashboardScreen extends StatelessWidget {
-  const DashboardScreen({super.key});
+  final DashboardResponseModel responseModel;
+  final String clientCode;
+
+  const DashboardScreen({super.key, required this.responseModel, required this.clientCode});
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => DashboardCubit()..loadDashboard(),
+      create: (context) => DashboardCubit()..loadFromModel(responseModel, clientCode: clientCode),
       child: const DashboardView(),
     );
   }
@@ -37,8 +45,8 @@ class DashboardView extends StatelessWidget {
                   Text(state.message, style: const TextStyle(color: Colors.red)),
                   const SizedBox(height: 16),
                   ElevatedButton(
-                    onPressed: () => context.read<DashboardCubit>().loadDashboard(),
-                    child: const Text('Retry'),
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: const Text('Go Back'),
                   ),
                 ],
               ),
@@ -50,7 +58,11 @@ class DashboardView extends StatelessWidget {
               children: [
                 _buildHeader(),
                 _buildDayTabs(context, state),
-                Expanded(child: _buildTimeSlots(state)),
+                Expanded(
+                  child: state.selectedBottomIndex == 0
+                      ? _buildTimeSlots(state)
+                      : _buildCorporateList(state),
+                ),
                 SafeArea(
                   top: false,
                   child: _buildBottomNavigation(context, state),
@@ -80,10 +92,19 @@ class DashboardView extends StatelessWidget {
               color: Colors.black,
             ),
           ),
-          Icon(
-            Icons.power_settings_new,
-            color: Colors.red,
-            size: 24.sp,
+          Builder(
+            builder: (context) => GestureDetector(
+              onTap: () async {
+                await LocalStorage.removeString(LocalStorageKeyName.clientCode);
+                if (context.mounted) {
+                  Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(builder: (_) => const LoginScreenScreen()),
+                    (_) => false,
+                  );
+                }
+              },
+              child: Icon(Icons.power_settings_new, color: Colors.red, size: 24.sp),
+            ),
           ),
         ],
       ),
@@ -127,70 +148,212 @@ class DashboardView extends StatelessWidget {
   }
 
   Widget _buildTimeSlots(DashboardLoaded state) {
-    return ListView.builder(
-      padding: EdgeInsets.all(16.w),
-      itemCount: state.timeSlots.length,
-      itemBuilder: (context, index) {
-        final timeSlot = state.timeSlots[index];
-        return Container(
-          margin: EdgeInsets.only(bottom: 12.h),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(8.r),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey.withOpacity(0.1),
-                spreadRadius: 1,
-                blurRadius: 2,
-                offset: const Offset(0, 1),
+    return Builder(
+      builder: (context) => RefreshIndicator(
+        onRefresh: () => context.read<DashboardCubit>().refreshData(),
+        child: ListView.builder(
+          padding: EdgeInsets.all(16.w),
+          itemCount: state.timeSlots.length,
+          itemBuilder: (context, index) {
+            final timeSlot = state.timeSlots[index];
+            return Container(
+              margin: EdgeInsets.only(bottom: 12.h),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(8.r),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.1),
+                    spreadRadius: 1,
+                    blurRadius: 2,
+                    offset: const Offset(0, 1),
+                  ),
+                ],
               ),
-            ],
-          ),
-          child: Column(
-            children: [
-              InkWell(
-                onTap: () => context.read<DashboardCubit>().toggleTimeSlot(index),
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 20.w,
-                        height: 20.h,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(color: Colors.orange, width: 2),
-                        ),
-                        child: Center(
-                          child: Container(
-                            width: 8.w,
-                            height: 8.h,
-                            decoration: const BoxDecoration(
-                              color: Colors.orange,
+              child: Column(
+                children: [
+                  InkWell(
+                    onTap: () => context.read<DashboardCubit>().toggleTimeSlot(index),
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 20.w,
+                            height: 20.h,
+                            decoration: BoxDecoration(
                               shape: BoxShape.circle,
+                              border: Border.all(color: Colors.orange, width: 2),
+                            ),
+                            child: Center(
+                              child: Container(
+                                width: 8.w,
+                                height: 8.h,
+                                decoration: const BoxDecoration(
+                                  color: Colors.orange,
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
                             ),
                           ),
-                        ),
+                          SizedBox(width: 16.w),
+                          Text(
+                            timeSlot.time,
+                            style: TextStyle(
+                              fontSize: 16.sp,
+                              color: Colors.orange,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
                       ),
-                      SizedBox(width: 16.w),
-                      Text(
-                        timeSlot.time,
-                        style: TextStyle(
-                          fontSize: 16.sp,
-                          color: Colors.orange,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
-                ),
+                  if (timeSlot.isExpanded && timeSlot.meetings.isNotEmpty)
+                    ...timeSlot.meetings.map((meeting) => _buildMeetingItem(meeting)),
+                ],
               ),
-              if (timeSlot.isExpanded && timeSlot.meetings.isNotEmpty)
-                ...timeSlot.meetings.map((meeting) => _buildMeetingItem(meeting)),
-            ],
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCorporateList(DashboardLoaded state) {
+    if (state.corporateSlots.isEmpty) {
+      return const Center(child: CircularProgressIndicator());
+    }
+    return Builder(
+      builder: (context) => RefreshIndicator(
+        onRefresh: () => context.read<DashboardCubit>().refreshData(),
+        child: ListView.builder(
+          padding: EdgeInsets.all(16.w),
+          itemCount: state.corporateSlots.length,
+          itemBuilder: (context, index) {
+            final corporate = state.corporateSlots[index];
+            return Container(
+              margin: EdgeInsets.only(bottom: 12.h),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(8.r),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.1),
+                    spreadRadius: 1,
+                    blurRadius: 2,
+                    offset: const Offset(0, 1),
+                  ),
+                ],
+              ),
+              child: Column(
+                children: [
+                  InkWell(
+                    onTap: () => context.read<DashboardCubit>().toggleCorporateSlot(index),
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 20.w,
+                            height: 20.h,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(color: Colors.blue, width: 2),
+                            ),
+                            child: Center(
+                              child: Container(
+                                width: 8.w,
+                                height: 8.h,
+                                decoration: const BoxDecoration(color: Colors.blue, shape: BoxShape.circle),
+                              ),
+                            ),
+                          ),
+                          SizedBox(width: 12.w),
+                          Expanded(
+                            child: Text(
+                              corporate.corporateName,
+                              style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w600, color: Colors.black87),
+                            ),
+                          ),
+                          Icon(
+                            corporate.isExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+                            color: Colors.grey,
+                            size: 20.sp,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  if (corporate.isExpanded)
+                    ...corporate.slots.map((slot) => _buildCorporateSlotItem(slot)),
+                ],
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCorporateSlotItem(CorporateMeetingSlot slot) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
+      decoration: BoxDecoration(
+        border: Border(top: BorderSide(color: Colors.grey[200]!, width: 1)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            slot.meetingSlotTime,
+            style: TextStyle(fontSize: 13.sp, color: Colors.orange, fontWeight: FontWeight.w600),
           ),
-        );
-      },
+          SizedBox(height: 6.h),
+          ...slot.meetings.map((m) => Padding(
+            padding: EdgeInsets.only(bottom: 8.h),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(m.fundName, style: TextStyle(fontSize: 13.sp, color: Colors.blue, fontWeight: FontWeight.w500)),
+                          Text(m.clientName, style: TextStyle(fontSize: 12.sp, color: Colors.black87)),
+                        ],
+                      ),
+                    ),
+                    Text('Room ${m.roomNo}', style: TextStyle(fontSize: 12.sp, color: Colors.grey[600])),
+                  ],
+                ),
+                if (m.reps.isNotEmpty) ...[
+                  SizedBox(height: 4.h),
+                  Divider(height: 1, color: Colors.grey[300]),
+                  SizedBox(height: 4.h),
+                  Text('Representatives', style: TextStyle(fontSize: 11.sp, color: Colors.grey[600], fontWeight: FontWeight.w600)),
+                  SizedBox(height: 3.h),
+                  ...m.reps.map((rep) => Padding(
+                    padding: EdgeInsets.only(bottom: 3.h),
+                    child: Row(
+                      children: [
+                        Icon(Icons.person_outline, size: 13.sp, color: Colors.grey[500]),
+                        SizedBox(width: 4.w),
+                        Text(rep.name, style: TextStyle(fontSize: 12.sp, color: Colors.black87, fontWeight: FontWeight.w500)),
+                        SizedBox(width: 4.w),
+                        Text('(${rep.designation.trim()})', style: TextStyle(fontSize: 11.sp, color: Colors.grey[600])),
+                      ],
+                    ),
+                  )),
+                ],
+              ],
+            ),
+          )),
+        ],
+      ),
     );
   }
 
@@ -225,45 +388,44 @@ class DashboardView extends StatelessWidget {
                     Expanded(
                       child: Text(
                         meeting.companyName,
-                        style: TextStyle(
-                          fontSize: 14.sp,
-                          color: Colors.blue,
-                          fontWeight: FontWeight.w600,
-                        ),
+                        style: TextStyle(fontSize: 14.sp, color: Colors.blue, fontWeight: FontWeight.w600),
                       ),
                     ),
-                    Text(
-                      'Room No',
-                      style: TextStyle(fontSize: 12.sp, color: Colors.grey[600]),
-                    ),
+                    Text('Room No', style: TextStyle(fontSize: 12.sp, color: Colors.grey[600])),
                   ],
                 ),
                 SizedBox(height: 4.h),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      meeting.contactPerson,
-                      style: TextStyle(fontSize: 13.sp, color: Colors.black87),
-                    ),
-                    Text(
-                      meeting.roomNo,
-                      style: TextStyle(
-                        fontSize: 13.sp,
-                        color: Colors.black,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
+                    Text(meeting.contactPerson, style: TextStyle(fontSize: 13.sp, color: Colors.black87)),
+                    Text(meeting.roomNo, style: TextStyle(fontSize: 13.sp, color: Colors.black, fontWeight: FontWeight.w600)),
                   ],
                 ),
-                SizedBox(height: 8.h),
+                SizedBox(height: 6.h),
                 ...meeting.attendees.map((attendee) => Padding(
-                      padding: EdgeInsets.only(bottom: 2.h),
-                      child: Text(
-                        attendee,
-                        style: TextStyle(fontSize: 12.sp, color: Colors.black87),
-                      ),
-                    )),
+                  padding: EdgeInsets.only(bottom: 2.h),
+                  child: Text(attendee, style: TextStyle(fontSize: 12.sp, color: Colors.black87)),
+                )),
+                if (meeting.reps.isNotEmpty) ...[
+                  SizedBox(height: 8.h),
+                  Divider(height: 1, color: Colors.grey[300]),
+                  SizedBox(height: 6.h),
+                  Text('Representatives', style: TextStyle(fontSize: 11.sp, color: Colors.grey[600], fontWeight: FontWeight.w600)),
+                  SizedBox(height: 4.h),
+                  ...meeting.reps.map((rep) => Padding(
+                    padding: EdgeInsets.only(bottom: 3.h),
+                    child: Row(
+                      children: [
+                        Icon(Icons.person_outline, size: 13.sp, color: Colors.grey[500]),
+                        SizedBox(width: 4.w),
+                        Text(rep.name, style: TextStyle(fontSize: 12.sp, color: Colors.black87, fontWeight: FontWeight.w500)),
+                        SizedBox(width: 4.w),
+                        Text('(${rep.designation.trim()})', style: TextStyle(fontSize: 11.sp, color: Colors.grey[600])),
+                      ],
+                    ),
+                  )),
+                ],
               ],
             ),
           ),

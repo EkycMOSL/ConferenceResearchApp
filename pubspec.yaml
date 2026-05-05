@@ -83,3 +83,4 @@ flutter:
     - lib/imageAssets/splash.jpg
     - lib/imageAssets/motilallogo.png
     - lib/imageAssets/investorlogo.png
+    - lib/imageAssets/ic_loader.json

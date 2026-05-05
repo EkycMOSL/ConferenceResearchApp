@@ -1,3 +1,4 @@
+import 'package:conferance_application/data/models/dashboard/dashboard_response_model.dart';
 import 'package:equatable/equatable.dart';
 
 abstract class LoginScreenState extends Equatable {
@@ -21,9 +22,10 @@ class LoginScreenError extends LoginScreenState {
 }
 
 class AnalystScheduleSuccess extends LoginScreenState {
-  final String message;
-  const AnalystScheduleSuccess(this.message);
-  @override
-  List<Object?> get props => [message];
-}
+  final DashboardResponseModel responseModel;
 
+  const AnalystScheduleSuccess(this.responseModel);
+
+  @override
+  List<Object?> get props => [responseModel];
+}

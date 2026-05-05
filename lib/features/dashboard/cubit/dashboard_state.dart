@@ -1,3 +1,5 @@
+import 'package:conferance_application/data/models/dashboard/corporate_response_model.dart';
+import 'package:conferance_application/data/models/dashboard/dashboard_response_model.dart';
 import 'package:equatable/equatable.dart';
 
 abstract class DashboardState extends Equatable {
@@ -16,28 +18,44 @@ class DashboardLoaded extends DashboardState {
   final List<String> days;
   final List<TimeSlot> timeSlots;
   final int selectedBottomIndex;
+  final List<AGICMeeting> agicMeetings;
+  final List<CorporateAGICMeeting> corporateMeetings;
+  final List<CorporateSlot> corporateSlots;
+  final String clientCode;
 
   const DashboardLoaded({
     required this.selectedDayIndex,
     required this.days,
     required this.timeSlots,
     required this.selectedBottomIndex,
+    required this.agicMeetings,
+    required this.clientCode,
+    this.corporateMeetings = const [],
+    this.corporateSlots = const [],
   });
 
   @override
-  List<Object?> get props => [selectedDayIndex, days, timeSlots, selectedBottomIndex];
+  List<Object?> get props => [selectedDayIndex, days, timeSlots, selectedBottomIndex, agicMeetings, corporateMeetings, corporateSlots, clientCode];
 
   DashboardLoaded copyWith({
     int? selectedDayIndex,
     List<String>? days,
     List<TimeSlot>? timeSlots,
     int? selectedBottomIndex,
+    List<AGICMeeting>? agicMeetings,
+    List<CorporateAGICMeeting>? corporateMeetings,
+    List<CorporateSlot>? corporateSlots,
+    String? clientCode,
   }) {
     return DashboardLoaded(
       selectedDayIndex: selectedDayIndex ?? this.selectedDayIndex,
       days: days ?? this.days,
       timeSlots: timeSlots ?? this.timeSlots,
       selectedBottomIndex: selectedBottomIndex ?? this.selectedBottomIndex,
+      agicMeetings: agicMeetings ?? this.agicMeetings,
+      corporateMeetings: corporateMeetings ?? this.corporateMeetings,
+      corporateSlots: corporateSlots ?? this.corporateSlots,
+      clientCode: clientCode ?? this.clientCode,
     );
   }
 }
@@ -49,6 +67,29 @@ class DashboardError extends DashboardState {
 
   @override
   List<Object?> get props => [message];
+}
+
+class CorporateSlot extends Equatable {
+  final String corporateName;
+  final bool isExpanded;
+  final List<CorporateMeetingSlot> slots;
+
+  const CorporateSlot({
+    required this.corporateName,
+    required this.slots,
+    this.isExpanded = false,
+  });
+
+  @override
+  List<Object?> get props => [corporateName, isExpanded, slots];
+
+  CorporateSlot copyWith({String? corporateName, bool? isExpanded, List<CorporateMeetingSlot>? slots}) {
+    return CorporateSlot(
+      corporateName: corporateName ?? this.corporateName,
+      isExpanded: isExpanded ?? this.isExpanded,
+      slots: slots ?? this.slots,
+    );
+  }
 }
 
 class TimeSlot extends Equatable {
@@ -84,6 +125,9 @@ class Meeting extends Equatable {
   final String roomNo;
   final List<String> attendees;
   final int attendeeCount;
+  final String fundName;
+  final String natureOfMeeting;
+  final List<RepresentativeModel> reps;
 
   const Meeting({
     required this.companyName,
@@ -91,8 +135,11 @@ class Meeting extends Equatable {
     required this.roomNo,
     required this.attendees,
     required this.attendeeCount,
+    this.fundName = '',
+    this.natureOfMeeting = '',
+    this.reps = const [],
   });
 
   @override
-  List<Object?> get props => [companyName, contactPerson, roomNo, attendees, attendeeCount];
+  List<Object?> get props => [companyName, contactPerson, roomNo, attendees, attendeeCount, fundName, natureOfMeeting, reps];
 }

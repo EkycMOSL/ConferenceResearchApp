@@ -1,5 +1,6 @@
 import 'package:conferance_application/config/constant/assetspath.dart';
 import 'package:conferance_application/config/constant/colorsutils.dart';
+import 'package:conferance_application/features/dashboard/presentation/dashboard_screen.dart';
 import 'package:conferance_application/features/login_screen/presentation/login_screen.dart';
 import 'package:conferance_application/features/splash_screen/cubit/splash_cubit.dart';
 import 'package:conferance_application/features/splash_screen/cubit/splash_state.dart';
@@ -54,6 +55,15 @@ class _SplashViewState extends State<SplashView> {
         if (state is SplashNavigateToLogin) {
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(builder: (_) => const LoginScreenScreen()),
+          );
+        } else if (state is SplashNavigateToDashboard) {
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+              builder: (_) => DashboardScreen(
+                responseModel: state.responseModel,
+                clientCode: state.clientCode,
+              ),
+            ),
           );
         }
       },

@@ -1,6 +1,7 @@
 import 'package:conferance_application/config/constant/assetspath.dart';
 import 'package:conferance_application/config/constant/colorsutils.dart';
 import 'package:conferance_application/domain/respository/dashboard_repository.dart';
+import 'package:conferance_application/features/dashboard/presentation/dashboard_screen.dart';
 import 'package:conferance_application/features/login_screen/cubit/login_screen_cubit.dart';
 import 'package:conferance_application/features/login_screen/cubit/login_screen_state.dart';
 import 'package:flutter/material.dart';
@@ -84,6 +85,20 @@ class _LoginScreenViewState extends State<LoginScreenView> {
             if (!context.loaderOverlay.visible) context.loaderOverlay.show();
           } else {
             context.loaderOverlay.hide();
+            if (state is AnalystScheduleSuccess) {
+              Navigator.of(context).pushReplacement(
+                MaterialPageRoute(
+                  builder: (_) => DashboardScreen(
+                    responseModel: state.responseModel,
+                    clientCode: _idController.text.trim(),
+                  ),
+                ),
+              );
+            } else if (state is LoginScreenError) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(state.message)),
+              );
+            }
           }
         },
         builder: (context, state) {
@@ -172,7 +187,15 @@ class _LoginScreenViewState extends State<LoginScreenView> {
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: () {
-                        objLoginScreenCubit.getDashboardData(clientCode: _idController.text);
+                        if (_idController.text.trim().isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Please enter your 5 digit ID')),
+                          );
+                          return;
+                        }
+                        objLoginScreenCubit.getDashboardData(
+                          clientCode: _idController.text.trim(),
+                        );
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: _darkBlue,

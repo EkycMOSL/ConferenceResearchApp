@@ -41,10 +41,9 @@ class BaseApi {
           if(isToken == true) {
             _token = await _getToken() ?? "";
           }
-          String apiEncryptionKey = generateRandomKey();
-          Options options = Options(headers: header(key: encryptApiKey(apiEncryptionKey),token: _token,straccessCode: straccessCode));
+          Options options = Options(headers: header(key: "", token: _token, straccessCode: straccessCode));
           log("User Token: $_token");
-          result = await dio.post( url, data: encryptedBodyData(data: body, key: apiEncryptionKey), options: options);
+          result = await dio.post(url, data: body, options: options);
           break;
         }
 
@@ -55,24 +54,8 @@ class BaseApi {
       }
       if(result.data != null) {
         log("Response ${result}");
-        Map response = result.data;
-        if(response.containsKey("data"))
-        {
-          if(response["data"] is! Map){
-            return DataSuccess(response as T);
-          }
-
-          if(response["data"]["Status"] == true){
-            return DataSuccess(response["data"]);
-          }else{
-            return  DataError(response["data"]["Message"] ?? somethingWentWrong);
-          }
-        }
-        else {
-          return DataSuccess(response["data"]);
-        }
-
-
+        final response = result.data;
+        return DataSuccess(response as T);
       } else {
         return const DataError("Data is null");
       }
