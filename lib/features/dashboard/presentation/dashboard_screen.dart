@@ -85,11 +85,11 @@ class DashboardView extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
-            'NIKHIL AGARWAL',
+            'CONFERENCE RESEARCH APP',
             style: TextStyle(
-              fontSize: 16.sp,
+              fontSize: 18.sp,
               fontWeight: FontWeight.bold,
-              color: Colors.black,
+              color: Colors.blue,
             ),
           ),
           Builder(
