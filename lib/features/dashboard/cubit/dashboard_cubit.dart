@@ -85,9 +85,41 @@ class DashboardCubit extends Cubit<DashboardState> {
 
   List<CorporateSlot> _buildCorporateSlotsForDay(List<CorporateAGICMeeting> meetings, int dayIndex) {
     if (dayIndex >= meetings.length) return [];
-    return meetings[dayIndex].corporateList
-        .map((c) => CorporateSlot(corporateName: c.corporateName, slots: c.meetingSlots))
-        .toList();
+    return meetings[dayIndex].corporateList.map((c) {
+      final timeSlots = c.meetingSlots.map((slot) {
+        return CorporateTimeSlot(
+          time: slot.meetingSlotTime,
+          entries: _buildCorporateEntries(slot.meetings),
+        );
+      }).toList();
+      return CorporateSlot(corporateName: c.corporateName, timeSlots: timeSlots);
+    }).toList();
+  }
+
+  List<CorporateMeetingEntry> _buildCorporateEntries(List<MeetingItem> items) {
+    // Group by fund name
+    final Map<String, List<MeetingItem>> byFund = {};
+    for (final item in items) {
+      byFund.putIfAbsent(item.fundName, () => []).add(item);
+    }
+    final fundGroups = byFund.entries.map((e) => FundGroup(
+      fundName: e.key,
+      clientNames: e.value.map((i) => i.clientName).toList(),
+      reps: e.value.first.reps,
+    )).toList();
+
+    final first = items.first;
+    final reps = first.reps;
+    return [
+      CorporateMeetingEntry(
+        roomNo: first.roomNo,
+        contactPerson: reps.isNotEmpty ? reps.first.name : '',
+        attendeeCount: reps.length - 1,
+        natureOfMeeting: first.natureOfMeeting,
+        fundGroups: fundGroups,
+        allReps: reps,
+      ),
+    ];
   }
 
   List<TimeSlot> _buildTimeSlotsForDay(List<AGICMeeting> agicMeetings, int dayIndex) {
@@ -101,21 +133,41 @@ class DashboardCubit extends Cubit<DashboardState> {
   }
 
   List<Meeting> _groupMeetingsByCompany(List<MeetingItem> items) {
-    final Map<String, List<MeetingItem>> grouped = {};
+    final Map<String, List<MeetingItem>> byCompany = {};
     for (final item in items) {
-      grouped.putIfAbsent(item.companyName, () => []).add(item);
+      byCompany.putIfAbsent(item.companyName, () => []).add(item);
     }
-    return grouped.entries.map((entry) {
-      final first = entry.value.first;
+    return byCompany.entries.map((entry) {
+      final companyItems = entry.value;
+      final first = companyItems.first;
+
+      // Group by fund name within this company
+      final Map<String, List<MeetingItem>> byFund = {};
+      for (final item in companyItems) {
+        byFund.putIfAbsent(item.fundName, () => []).add(item);
+      }
+
+      final fundGroups = byFund.entries.map((fundEntry) {
+        return FundGroup(
+          fundName: fundEntry.key,
+          clientNames: fundEntry.value.map((e) => e.clientName).toList(),
+          reps: fundEntry.value.first.reps,
+        );
+      }).toList();
+
+      // Representatives are same for all items in the company, use first item's reps
+      final reps = first.reps;
+      final firstRepName = reps.isNotEmpty ? reps.first.name : '';
+      final extraRepCount = reps.length - 1;
+
       return Meeting(
         companyName: first.companyName,
-        contactPerson: first.contactName1,
+        contactPerson: firstRepName,
         roomNo: first.roomNo,
-        attendees: entry.value.map((e) => e.clientName).toList(),
-        attendeeCount: entry.value.length,
-        fundName: first.fundName,
+        attendeeCount: extraRepCount,
         natureOfMeeting: first.natureOfMeeting,
-        reps: first.reps,
+        fundGroups: fundGroups,
+        allReps: reps,
       );
     }).toList();
   }
@@ -146,12 +198,36 @@ class DashboardCubit extends Cubit<DashboardState> {
     }
   }
 
+  void toggleMeetingReps(int slotIndex, int meetingIndex) {
+    final currentState = state;
+    if (currentState is! DashboardLoaded) return;
+    final updatedSlots = List<TimeSlot>.from(currentState.timeSlots);
+    final updatedMeetings = List<Meeting>.from(updatedSlots[slotIndex].meetings);
+    final meeting = updatedMeetings[meetingIndex];
+    updatedMeetings[meetingIndex] = meeting.copyWith(isRepsExpanded: !meeting.isRepsExpanded);
+    updatedSlots[slotIndex] = updatedSlots[slotIndex].copyWith(meetings: updatedMeetings);
+    emit(currentState.copyWith(timeSlots: updatedSlots));
+  }
+
   void toggleTimeSlot(int index) {
     final currentState = state;
     if (currentState is! DashboardLoaded) return;
     final updatedSlots = List<TimeSlot>.from(currentState.timeSlots);
     updatedSlots[index] = updatedSlots[index].copyWith(isExpanded: !updatedSlots[index].isExpanded);
     emit(currentState.copyWith(timeSlots: updatedSlots));
+  }
+
+  void toggleCorporateMeetingReps(int slotIndex, int timeSlotIndex, int entryIndex) {
+    final currentState = state;
+    if (currentState is! DashboardLoaded) return;
+    final updatedSlots = List<CorporateSlot>.from(currentState.corporateSlots);
+    final updatedTimeSlots = List<CorporateTimeSlot>.from(updatedSlots[slotIndex].timeSlots);
+    final updatedEntries = List<CorporateMeetingEntry>.from(updatedTimeSlots[timeSlotIndex].entries);
+    final entry = updatedEntries[entryIndex];
+    updatedEntries[entryIndex] = entry.copyWith(isRepsExpanded: !entry.isRepsExpanded);
+    updatedTimeSlots[timeSlotIndex] = updatedTimeSlots[timeSlotIndex].copyWith(entries: updatedEntries);
+    updatedSlots[slotIndex] = updatedSlots[slotIndex].copyWith(timeSlots: updatedTimeSlots);
+    emit(currentState.copyWith(corporateSlots: updatedSlots));
   }
 
   void toggleCorporateSlot(int index) {

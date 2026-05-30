@@ -72,24 +72,84 @@ class DashboardError extends DashboardState {
 class CorporateSlot extends Equatable {
   final String corporateName;
   final bool isExpanded;
-  final List<CorporateMeetingSlot> slots;
+  final List<CorporateTimeSlot> timeSlots;
 
   const CorporateSlot({
     required this.corporateName,
-    required this.slots,
+    required this.timeSlots,
     this.isExpanded = false,
   });
 
   @override
-  List<Object?> get props => [corporateName, isExpanded, slots];
+  List<Object?> get props => [corporateName, isExpanded, timeSlots];
 
-  CorporateSlot copyWith({String? corporateName, bool? isExpanded, List<CorporateMeetingSlot>? slots}) {
+  CorporateSlot copyWith({String? corporateName, bool? isExpanded, List<CorporateTimeSlot>? timeSlots}) {
     return CorporateSlot(
       corporateName: corporateName ?? this.corporateName,
       isExpanded: isExpanded ?? this.isExpanded,
-      slots: slots ?? this.slots,
+      timeSlots: timeSlots ?? this.timeSlots,
     );
   }
+}
+
+class CorporateTimeSlot extends Equatable {
+  final String time;
+  final List<CorporateMeetingEntry> entries;
+
+  const CorporateTimeSlot({required this.time, required this.entries});
+
+  @override
+  List<Object?> get props => [time, entries];
+
+  CorporateTimeSlot copyWith({String? time, List<CorporateMeetingEntry>? entries}) {
+    return CorporateTimeSlot(
+      time: time ?? this.time,
+      entries: entries ?? this.entries,
+    );
+  }
+}
+
+class CorporateMeetingEntry extends Equatable {
+  final String roomNo;
+  final String contactPerson;
+  final int attendeeCount;
+  final String natureOfMeeting;
+  final List<FundGroup> fundGroups;
+  final List<RepresentativeModel> allReps;
+  final bool isRepsExpanded;
+
+  const CorporateMeetingEntry({
+    required this.roomNo,
+    required this.contactPerson,
+    required this.attendeeCount,
+    this.natureOfMeeting = '',
+    this.fundGroups = const [],
+    this.allReps = const [],
+    this.isRepsExpanded = false,
+  });
+
+  CorporateMeetingEntry copyWith({
+    String? roomNo,
+    String? contactPerson,
+    int? attendeeCount,
+    String? natureOfMeeting,
+    List<FundGroup>? fundGroups,
+    List<RepresentativeModel>? allReps,
+    bool? isRepsExpanded,
+  }) {
+    return CorporateMeetingEntry(
+      roomNo: roomNo ?? this.roomNo,
+      contactPerson: contactPerson ?? this.contactPerson,
+      attendeeCount: attendeeCount ?? this.attendeeCount,
+      natureOfMeeting: natureOfMeeting ?? this.natureOfMeeting,
+      fundGroups: fundGroups ?? this.fundGroups,
+      allReps: allReps ?? this.allReps,
+      isRepsExpanded: isRepsExpanded ?? this.isRepsExpanded,
+    );
+  }
+
+  @override
+  List<Object?> get props => [roomNo, contactPerson, attendeeCount, natureOfMeeting, fundGroups, allReps, isRepsExpanded];
 }
 
 class TimeSlot extends Equatable {
@@ -119,27 +179,64 @@ class TimeSlot extends Equatable {
   }
 }
 
+class FundGroup extends Equatable {
+  final String fundName;
+  final List<String> clientNames;
+  final List<RepresentativeModel> reps;
+
+  const FundGroup({
+    required this.fundName,
+    required this.clientNames,
+    this.reps = const [],
+  });
+
+  @override
+  List<Object?> get props => [fundName, clientNames, reps];
+}
+
 class Meeting extends Equatable {
   final String companyName;
   final String contactPerson;
   final String roomNo;
-  final List<String> attendees;
   final int attendeeCount;
-  final String fundName;
   final String natureOfMeeting;
-  final List<RepresentativeModel> reps;
+  final List<FundGroup> fundGroups;
+  final List<RepresentativeModel> allReps;
+  final bool isRepsExpanded;
 
   const Meeting({
     required this.companyName,
     required this.contactPerson,
     required this.roomNo,
-    required this.attendees,
     required this.attendeeCount,
-    this.fundName = '',
     this.natureOfMeeting = '',
-    this.reps = const [],
+    this.fundGroups = const [],
+    this.allReps = const [],
+    this.isRepsExpanded = false,
   });
 
+  Meeting copyWith({
+    String? companyName,
+    String? contactPerson,
+    String? roomNo,
+    int? attendeeCount,
+    String? natureOfMeeting,
+    List<FundGroup>? fundGroups,
+    List<RepresentativeModel>? allReps,
+    bool? isRepsExpanded,
+  }) {
+    return Meeting(
+      companyName: companyName ?? this.companyName,
+      contactPerson: contactPerson ?? this.contactPerson,
+      roomNo: roomNo ?? this.roomNo,
+      attendeeCount: attendeeCount ?? this.attendeeCount,
+      natureOfMeeting: natureOfMeeting ?? this.natureOfMeeting,
+      fundGroups: fundGroups ?? this.fundGroups,
+      allReps: allReps ?? this.allReps,
+      isRepsExpanded: isRepsExpanded ?? this.isRepsExpanded,
+    );
+  }
+
   @override
-  List<Object?> get props => [companyName, contactPerson, roomNo, attendees, attendeeCount, fundName, natureOfMeeting, reps];
+  List<Object?> get props => [companyName, contactPerson, roomNo, attendeeCount, natureOfMeeting, fundGroups, allReps, isRepsExpanded];
 }

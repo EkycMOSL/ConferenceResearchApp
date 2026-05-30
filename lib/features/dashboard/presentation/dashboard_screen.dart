@@ -1,6 +1,5 @@
 import 'package:conferance_application/config/appConfigUtils/local_storage_key.dart';
 import 'package:conferance_application/config/appConfigUtils/localstorage.dart';
-import 'package:conferance_application/data/models/dashboard/corporate_response_model.dart';
 import 'package:conferance_application/data/models/dashboard/dashboard_response_model.dart';
 import 'package:conferance_application/features/login_screen/presentation/login_screen.dart';
 import 'package:flutter/material.dart';
@@ -8,6 +7,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../cubit/dashboard_cubit.dart';
 import '../cubit/dashboard_state.dart';
+
+const Color _darkBlue = Color(0xFF2B2E8C);
+const Color _gold = Color(0xFFFFC107);
 
 class DashboardScreen extends StatelessWidget {
   final DashboardResponseModel responseModel;
@@ -36,7 +38,6 @@ class DashboardView extends StatelessWidget {
           if (state is DashboardLoading) {
             return const Center(child: CircularProgressIndicator());
           }
-          
           if (state is DashboardError) {
             return Center(
               child: Column(
@@ -52,7 +53,6 @@ class DashboardView extends StatelessWidget {
               ),
             );
           }
-          
           if (state is DashboardLoaded) {
             return Column(
               children: [
@@ -70,7 +70,6 @@ class DashboardView extends StatelessWidget {
               ],
             );
           }
-          
           return const SizedBox.shrink();
         },
       ),
@@ -86,11 +85,7 @@ class DashboardView extends StatelessWidget {
         children: [
           Text(
             'CONFERENCE RESEARCH APP',
-            style: TextStyle(
-              fontSize: 18.sp,
-              fontWeight: FontWeight.bold,
-              color: Colors.blue,
-            ),
+            style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold, color: Colors.blue),
           ),
           Builder(
             builder: (context) => GestureDetector(
@@ -210,7 +205,9 @@ class DashboardView extends StatelessWidget {
                     ),
                   ),
                   if (timeSlot.isExpanded && timeSlot.meetings.isNotEmpty)
-                    ...timeSlot.meetings.map((meeting) => _buildMeetingItem(meeting)),
+                    ...timeSlot.meetings.asMap().entries.map(
+                      (e) => _buildMeetingItem(context, index, e.key, e.value),
+                    ),
                 ],
               ),
             );
@@ -286,7 +283,10 @@ class DashboardView extends StatelessWidget {
                     ),
                   ),
                   if (corporate.isExpanded)
-                    ...corporate.slots.map((slot) => _buildCorporateSlotItem(slot)),
+                    ...corporate.timeSlots.asMap().entries.map(
+                      (tsEntry) => _buildCorporateSlotItem(
+                        context, index, tsEntry.key, tsEntry.value, corporate.corporateName),
+                    ),
                 ],
               ),
             );
@@ -296,136 +296,281 @@ class DashboardView extends StatelessWidget {
     );
   }
 
-  Widget _buildCorporateSlotItem(CorporateMeetingSlot slot) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
-      decoration: BoxDecoration(
-        border: Border(top: BorderSide(color: Colors.grey[200]!, width: 1)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            slot.meetingSlotTime,
-            style: TextStyle(fontSize: 13.sp, color: Colors.orange, fontWeight: FontWeight.w600),
+  Widget _buildCorporateSlotItem(BuildContext context, int slotIndex, int timeSlotIndex, CorporateTimeSlot slot, String corporateName) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+          decoration: BoxDecoration(
+            border: Border(top: BorderSide(color: Colors.grey[200]!, width: 1)),
           ),
-          SizedBox(height: 6.h),
-          ...slot.meetings.map((m) => Padding(
-            padding: EdgeInsets.only(bottom: 8.h),
-            child: Column(
+          child: Text(
+            slot.time,
+            style: TextStyle(fontSize: 12.sp, color: Colors.orange, fontWeight: FontWeight.w600),
+          ),
+        ),
+        ...slot.entries.asMap().entries.map((eEntry) {
+          final entryIndex = eEntry.key;
+          final entry = eEntry.value;
+          final isGroup = entry.natureOfMeeting.toLowerCase().contains('group');
+          final extraCount = entry.attendeeCount;
+          return Container(
+            padding: EdgeInsets.fromLTRB(12.w, 8.h, 12.w, 8.h),
+            decoration: BoxDecoration(
+              border: Border(top: BorderSide(color: Colors.grey[100]!, width: 1)),
+            ),
+            child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                // Avatar + label
+                Column(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(m.fundName, style: TextStyle(fontSize: 13.sp, color: Colors.blue, fontWeight: FontWeight.w500)),
-                          Text(m.clientName, style: TextStyle(fontSize: 12.sp, color: Colors.black87)),
-                        ],
+                    isGroup
+                        ? Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              Container(
+                                width: 36.w,
+                                height: 36.h,
+                                decoration: const BoxDecoration(
+                                  color: Color(0xFFFFEBEE),
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
+                              Icon(Icons.person, color: Colors.red, size: 22.sp),
+                            ],
+                          )
+                        : Container(
+                            width: 36.w,
+                            height: 36.h,
+                            decoration: BoxDecoration(
+                              color: Colors.grey[200],
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(Icons.person, color: Colors.grey[500], size: 22.sp),
+                          ),
+                    SizedBox(height: 4.h),
+                    Text(
+                      isGroup ? 'G' : '1',
+                      style: TextStyle(
+                        fontSize: 13.sp,
+                        fontWeight: FontWeight.bold,
+                        color: isGroup ? Colors.red : _darkBlue,
                       ),
                     ),
-                    Text('Room ${m.roomNo}', style: TextStyle(fontSize: 12.sp, color: Colors.grey[600])),
                   ],
                 ),
-                if (m.reps.isNotEmpty) ...[
-                  SizedBox(height: 4.h),
-                  Divider(height: 1, color: Colors.grey[300]),
-                  SizedBox(height: 4.h),
-                  Text('Representatives', style: TextStyle(fontSize: 11.sp, color: Colors.grey[600], fontWeight: FontWeight.w600)),
-                  SizedBox(height: 3.h),
-                  ...m.reps.map((rep) => Padding(
-                    padding: EdgeInsets.only(bottom: 3.h),
-                    child: Row(
-                      children: [
-                        Icon(Icons.person_outline, size: 13.sp, color: Colors.grey[500]),
-                        SizedBox(width: 4.w),
-                        Text(rep.name, style: TextStyle(fontSize: 12.sp, color: Colors.black87, fontWeight: FontWeight.w500)),
-                        SizedBox(width: 4.w),
-                        Text('(${rep.designation.trim()})', style: TextStyle(fontSize: 11.sp, color: Colors.grey[600])),
-                      ],
-                    ),
-                  )),
-                ],
+                SizedBox(width: 10.w),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Company name + Room No label
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              corporateName.toUpperCase(),
+                              style: TextStyle(
+                                fontSize: 13.sp,
+                                color: _darkBlue,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                          Text(
+                            'Room No',
+                            style: TextStyle(fontSize: 10.sp, color: _gold, fontWeight: FontWeight.w600),
+                          ),
+                        ],
+                      ),
+                      // First rep + N More + room number
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Row(
+                              children: [
+                                Text(
+                                  entry.contactPerson,
+                                  style: TextStyle(fontSize: 12.sp, color: Colors.black87),
+                                ),
+                                if (extraCount > 0) ...[
+                                  SizedBox(width: 6.w),
+                                  GestureDetector(
+                                    onTap: () => context.read<DashboardCubit>().toggleCorporateMeetingReps(
+                                          slotIndex, timeSlotIndex, entryIndex),
+                                    child: Text(
+                                      '...$extraCount More',
+                                      style: TextStyle(fontSize: 11.sp, color: Colors.grey[500]),
+                                    ),
+                                  ),
+                                ],
+                              ],
+                            ),
+                          ),
+                          Text(
+                            entry.roomNo,
+                            style: TextStyle(fontSize: 13.sp, color: Colors.black, fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      ),
+                      // Expanded reps (skip first)
+                      if (entry.isRepsExpanded && entry.allReps.length > 1)
+                        ...entry.allReps.skip(1).map((rep) => Padding(
+                              padding: EdgeInsets.only(top: 2.h),
+                              child: Text(rep.name, style: TextStyle(fontSize: 12.sp, color: Colors.black87)),
+                            )),
+                      SizedBox(height: 6.h),
+                      // Fund groups
+                      ...entry.fundGroups.map((fund) => Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                fund.fundName,
+                                style: TextStyle(
+                                  fontSize: 12.sp,
+                                  color: Colors.blue[700],
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              SizedBox(height: 2.h),
+                              ...fund.clientNames.map((name) => Padding(
+                                    padding: EdgeInsets.only(bottom: 2.h),
+                                    child: Text(name, style: TextStyle(fontSize: 12.sp, color: Colors.black87)),
+                                  )),
+                              SizedBox(height: 4.h),
+                            ],
+                          )),
+                    ],
+                  ),
+                ),
               ],
             ),
-          )),
-        ],
-      ),
+          );
+        }),
+      ],
     );
   }
 
-  Widget _buildMeetingItem(Meeting meeting) {
+  Widget _buildMeetingItem(BuildContext context, int slotIndex, int meetingIndex, Meeting meeting) {
+    final extraCount = meeting.attendeeCount;
+    final isGroup = meeting.natureOfMeeting.toLowerCase().contains('group');
+
     return Container(
-      padding: EdgeInsets.all(16.w),
+      padding: EdgeInsets.fromLTRB(12.w, 10.h, 12.w, 10.h),
       decoration: BoxDecoration(
         border: Border(top: BorderSide(color: Colors.grey[200]!, width: 1)),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            width: 40.w,
-            height: 40.h,
-            decoration: BoxDecoration(
-              color: Colors.green,
-              borderRadius: BorderRadius.circular(4.r),
-            ),
-            child: Center(
-              child: Icon(Icons.person, color: Colors.white, size: 24.sp),
-            ),
+          // Left: avatar icon + label below
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              isGroup
+                  ? Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        Container(
+                          width: 36.w,
+                          height: 36.h,
+                          decoration: const BoxDecoration(
+                            color: Color(0xFFFFEBEE),
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                        Icon(Icons.person, color: Colors.red, size: 22.sp),
+                      ],
+                    )
+                  : Container(
+                      width: 36.w,
+                      height: 36.h,
+                      decoration: BoxDecoration(
+                        color: Colors.grey[200],
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(Icons.person, color: Colors.grey[500], size: 22.sp),
+                    ),
+              SizedBox(height: 4.h),
+              Text(
+                isGroup ? 'G' : '1',
+                style: TextStyle(
+                  fontSize: 13.sp,
+                  fontWeight: FontWeight.bold,
+                  color: isGroup ? Colors.red : _darkBlue,
+                ),
+              ),
+            ],
           ),
-          SizedBox(width: 12.w),
+          SizedBox(width: 10.w),
+          // Right content
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Company name + Room No label
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Expanded(
                       child: Text(
-                        meeting.companyName,
-                        style: TextStyle(fontSize: 14.sp, color: Colors.blue, fontWeight: FontWeight.w600),
+                        meeting.companyName.toUpperCase(),
+                        style: TextStyle(fontSize: 13.sp, color: _darkBlue, fontWeight: FontWeight.bold),
                       ),
                     ),
-                    Text('Room No', style: TextStyle(fontSize: 12.sp, color: Colors.grey[600])),
+                    Text('Room No', style: TextStyle(fontSize: 10.sp, color: _gold, fontWeight: FontWeight.w600)),
                   ],
                 ),
-                SizedBox(height: 4.h),
+                // First rep name + ...N More (tappable) + Room number
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(meeting.contactPerson, style: TextStyle(fontSize: 13.sp, color: Colors.black87)),
-                    Text(meeting.roomNo, style: TextStyle(fontSize: 13.sp, color: Colors.black, fontWeight: FontWeight.w600)),
+                    Expanded(
+                      child: Row(
+                        children: [
+                          Text(meeting.contactPerson, style: TextStyle(fontSize: 12.sp, color: Colors.black87)),
+                          if (extraCount > 0) ...[
+                            SizedBox(width: 6.w),
+                            GestureDetector(
+                              onTap: () => context.read<DashboardCubit>().toggleMeetingReps(slotIndex, meetingIndex),
+                              child: Text(
+                                '...$extraCount More',
+                                style: TextStyle(fontSize: 11.sp, color: Colors.grey[500]),
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                    Text(meeting.roomNo, style: TextStyle(fontSize: 13.sp, color: Colors.black, fontWeight: FontWeight.bold)),
                   ],
                 ),
+                // Expanded reps (all except first)
+                if (meeting.isRepsExpanded && meeting.allReps.length > 1)
+                  ...meeting.allReps.skip(1).map((rep) => Padding(
+                        padding: EdgeInsets.only(top: 2.h),
+                        child: Text(rep.name, style: TextStyle(fontSize: 12.sp, color: Colors.black87)),
+                      )),
                 SizedBox(height: 6.h),
-                ...meeting.attendees.map((attendee) => Padding(
-                  padding: EdgeInsets.only(bottom: 2.h),
-                  child: Text(attendee, style: TextStyle(fontSize: 12.sp, color: Colors.black87)),
-                )),
-                if (meeting.reps.isNotEmpty) ...[
-                  SizedBox(height: 8.h),
-                  Divider(height: 1, color: Colors.grey[300]),
-                  SizedBox(height: 6.h),
-                  Text('Representatives', style: TextStyle(fontSize: 11.sp, color: Colors.grey[600], fontWeight: FontWeight.w600)),
-                  SizedBox(height: 4.h),
-                  ...meeting.reps.map((rep) => Padding(
-                    padding: EdgeInsets.only(bottom: 3.h),
-                    child: Row(
+                // Fund groups
+                ...meeting.fundGroups.map((fund) => Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Icon(Icons.person_outline, size: 13.sp, color: Colors.grey[500]),
-                        SizedBox(width: 4.w),
-                        Text(rep.name, style: TextStyle(fontSize: 12.sp, color: Colors.black87, fontWeight: FontWeight.w500)),
-                        SizedBox(width: 4.w),
-                        Text('(${rep.designation.trim()})', style: TextStyle(fontSize: 11.sp, color: Colors.grey[600])),
+                        Text(
+                          fund.fundName,
+                          style: TextStyle(fontSize: 12.sp, color: Colors.blue[700], fontWeight: FontWeight.w500),
+                        ),
+                        SizedBox(height: 2.h),
+                        ...fund.clientNames.map((name) => Padding(
+                              padding: EdgeInsets.only(bottom: 2.h),
+                              child: Text(name, style: TextStyle(fontSize: 12.sp, color: Colors.black87)),
+                            )),
+                        SizedBox(height: 4.h),
                       ],
-                    ),
-                  )),
-                ],
+                    )),
               ],
             ),
           ),
@@ -450,19 +595,13 @@ class DashboardView extends StatelessWidget {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(
-                      Icons.access_time,
-                      color: state.selectedBottomIndex == 0 ? Colors.white : Colors.grey[600],
-                      size: 20.sp,
-                    ),
+                    Icon(Icons.access_time,
+                        color: state.selectedBottomIndex == 0 ? Colors.white : Colors.grey[600], size: 20.sp),
                     SizedBox(height: 4.h),
-                    Text(
-                      'Time Wise',
-                      style: TextStyle(
-                        fontSize: 12.sp,
-                        color: state.selectedBottomIndex == 0 ? Colors.white : Colors.grey[600],
-                      ),
-                    ),
+                    Text('Time Wise',
+                        style: TextStyle(
+                            fontSize: 12.sp,
+                            color: state.selectedBottomIndex == 0 ? Colors.white : Colors.grey[600])),
                   ],
                 ),
               ),
@@ -479,19 +618,13 @@ class DashboardView extends StatelessWidget {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(
-                      Icons.business,
-                      color: state.selectedBottomIndex == 1 ? Colors.white : Colors.grey[600],
-                      size: 20.sp,
-                    ),
+                    Icon(Icons.business,
+                        color: state.selectedBottomIndex == 1 ? Colors.white : Colors.grey[600], size: 20.sp),
                     SizedBox(height: 4.h),
-                    Text(
-                      'Corporate Wise',
-                      style: TextStyle(
-                        fontSize: 12.sp,
-                        color: state.selectedBottomIndex == 1 ? Colors.white : Colors.grey[600],
-                      ),
-                    ),
+                    Text('Corporate Wise',
+                        style: TextStyle(
+                            fontSize: 12.sp,
+                            color: state.selectedBottomIndex == 1 ? Colors.white : Colors.grey[600])),
                   ],
                 ),
               ),
