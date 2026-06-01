@@ -1,5 +1,7 @@
 import 'package:conferance_application/config/appConfigUtils/local_storage_key.dart';
 import 'package:conferance_application/config/appConfigUtils/localstorage.dart';
+import 'package:conferance_application/config/constant/assetspath.dart';
+import 'package:conferance_application/config/constant/colorsutils.dart';
 import 'package:conferance_application/data/models/dashboard/dashboard_response_model.dart';
 import 'package:conferance_application/features/login_screen/presentation/login_screen.dart';
 import 'package:flutter/material.dart';
@@ -178,14 +180,14 @@ class DashboardView extends StatelessWidget {
                             height: 20.h,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              border: Border.all(color: Colors.orange, width: 2),
+                              border: Border.all(color: orangeListItem, width: 2),
                             ),
                             child: Center(
                               child: Container(
                                 width: 8.w,
                                 height: 8.h,
                                 decoration: const BoxDecoration(
-                                  color: Colors.orange,
+                                  color: orangeListItem,
                                   shape: BoxShape.circle,
                                 ),
                               ),
@@ -196,7 +198,7 @@ class DashboardView extends StatelessWidget {
                             timeSlot.time,
                             style: TextStyle(
                               fontSize: 16.sp,
-                              color: Colors.orange,
+                              color: orangeListItem,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
@@ -248,7 +250,7 @@ class DashboardView extends StatelessWidget {
                   InkWell(
                     onTap: () => context.read<DashboardCubit>().toggleCorporateSlot(index),
                     child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+                      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
                       child: Row(
                         children: [
                           Container(
@@ -256,27 +258,34 @@ class DashboardView extends StatelessWidget {
                             height: 20.h,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              border: Border.all(color: Colors.blue, width: 2),
+                              border: Border.all(color: orangeListItem, width: 2),
                             ),
                             child: Center(
                               child: Container(
                                 width: 8.w,
                                 height: 8.h,
-                                decoration: const BoxDecoration(color: Colors.blue, shape: BoxShape.circle),
+                                decoration: const BoxDecoration(
+                                  color: orangeListItem,
+                                  shape: BoxShape.circle,
+                                ),
                               ),
                             ),
                           ),
-                          SizedBox(width: 12.w),
+                          SizedBox(width: 16.w),
                           Expanded(
                             child: Text(
                               corporate.corporateName,
-                              style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w600, color: Colors.black87),
+                              style: TextStyle(
+                                fontSize: 16.sp,
+                                color: orangeListItem,
+                                fontWeight: FontWeight.w500,
+                              ),
                             ),
                           ),
                           Icon(
-                            corporate.isExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
-                            color: Colors.grey,
-                            size: 20.sp,
+                            Icons.picture_as_pdf,
+                            color: Colors.red,
+                            size: 22.sp,
                           ),
                         ],
                       ),
@@ -313,7 +322,6 @@ class DashboardView extends StatelessWidget {
         ...slot.entries.asMap().entries.map((eEntry) {
           final entryIndex = eEntry.key;
           final entry = eEntry.value;
-          final isGroup = entry.natureOfMeeting.toLowerCase().contains('group');
           final extraCount = entry.attendeeCount;
           return Container(
             padding: EdgeInsets.fromLTRB(12.w, 8.h, 12.w, 8.h),
@@ -324,43 +332,10 @@ class DashboardView extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Avatar + label
-                Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    isGroup
-                        ? Stack(
-                            alignment: Alignment.center,
-                            children: [
-                              Container(
-                                width: 36.w,
-                                height: 36.h,
-                                decoration: const BoxDecoration(
-                                  color: Color(0xFFFFEBEE),
-                                  shape: BoxShape.circle,
-                                ),
-                              ),
-                              Icon(Icons.person, color: Colors.red, size: 22.sp),
-                            ],
-                          )
-                        : Container(
-                            width: 36.w,
-                            height: 36.h,
-                            decoration: BoxDecoration(
-                              color: Colors.grey[200],
-                              shape: BoxShape.circle,
-                            ),
-                            child: Icon(Icons.person, color: Colors.grey[500], size: 22.sp),
-                          ),
-                    SizedBox(height: 4.h),
-                    Text(
-                      isGroup ? 'G' : '1',
-                      style: TextStyle(
-                        fontSize: 13.sp,
-                        fontWeight: FontWeight.bold,
-                        color: isGroup ? Colors.red : _darkBlue,
-                      ),
-                    ),
-                  ],
+                Image.asset(
+                  _getMeetingIcon(entry.natureOfMeeting),
+                  width: 36.w,
+                  height: 36.h,
                 ),
                 SizedBox(width: 10.w),
                 Expanded(
@@ -376,14 +351,14 @@ class DashboardView extends StatelessWidget {
                               corporateName.toUpperCase(),
                               style: TextStyle(
                                 fontSize: 13.sp,
-                                color: _darkBlue,
+                                color: lightBlueCompanyName,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
                           ),
                           Text(
                             'Room No',
-                            style: TextStyle(fontSize: 10.sp, color: _gold, fontWeight: FontWeight.w600),
+                            style: TextStyle(fontSize: 10.sp, color: purpleRoomNo, fontWeight: FontWeight.w600),
                           ),
                         ],
                       ),
@@ -404,7 +379,7 @@ class DashboardView extends StatelessWidget {
                                           slotIndex, timeSlotIndex, entryIndex),
                                     child: Text(
                                       '...$extraCount More',
-                                      style: TextStyle(fontSize: 11.sp, color: Colors.grey[500]),
+                                      style: TextStyle(fontSize: 11.sp, color: Colors.black),
                                     ),
                                   ),
                                 ],
@@ -432,7 +407,7 @@ class DashboardView extends StatelessWidget {
                                 fund.fundName,
                                 style: TextStyle(
                                   fontSize: 12.sp,
-                                  color: Colors.blue[700],
+                                  color: blueFundName,
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
@@ -455,9 +430,19 @@ class DashboardView extends StatelessWidget {
     );
   }
 
+  String _getMeetingIcon(String natureOfMeeting) {
+    switch (natureOfMeeting) {
+      case '1-1':  return AssetsPath.one_in_one;
+      case '2-1': return AssetsPath.two_in_one;
+      case '3-1': return AssetsPath.three_in_one;
+      case '4-1': return AssetsPath.four_in_one;
+      case 'Small Group': return AssetsPath.group_icon;
+      default: return AssetsPath.mtrack_icon; // Workshop + else
+    }
+  }
+
   Widget _buildMeetingItem(BuildContext context, int slotIndex, int meetingIndex, Meeting meeting) {
     final extraCount = meeting.attendeeCount;
-    final isGroup = meeting.natureOfMeeting.toLowerCase().contains('group');
 
     return Container(
       padding: EdgeInsets.fromLTRB(12.w, 10.h, 12.w, 10.h),
@@ -467,44 +452,11 @@ class DashboardView extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Left: avatar icon + label below
-          Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              isGroup
-                  ? Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        Container(
-                          width: 36.w,
-                          height: 36.h,
-                          decoration: const BoxDecoration(
-                            color: Color(0xFFFFEBEE),
-                            shape: BoxShape.circle,
-                          ),
-                        ),
-                        Icon(Icons.person, color: Colors.red, size: 22.sp),
-                      ],
-                    )
-                  : Container(
-                      width: 36.w,
-                      height: 36.h,
-                      decoration: BoxDecoration(
-                        color: Colors.grey[200],
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(Icons.person, color: Colors.grey[500], size: 22.sp),
-                    ),
-              SizedBox(height: 4.h),
-              Text(
-                isGroup ? 'G' : '1',
-                style: TextStyle(
-                  fontSize: 13.sp,
-                  fontWeight: FontWeight.bold,
-                  color: isGroup ? Colors.red : _darkBlue,
-                ),
-              ),
-            ],
+          // Left: avatar icon
+          Image.asset(
+            _getMeetingIcon(meeting.natureOfMeeting),
+             width: 36.w,
+             height: 36.h,
           ),
           SizedBox(width: 10.w),
           // Right content
@@ -519,10 +471,10 @@ class DashboardView extends StatelessWidget {
                     Expanded(
                       child: Text(
                         meeting.companyName.toUpperCase(),
-                        style: TextStyle(fontSize: 13.sp, color: _darkBlue, fontWeight: FontWeight.bold),
+                        style: TextStyle(fontSize: 13.sp, color: lightBlueCompanyName, fontWeight: FontWeight.bold),
                       ),
                     ),
-                    Text('Room No', style: TextStyle(fontSize: 10.sp, color: _gold, fontWeight: FontWeight.w600)),
+                    Text('Room No', style: TextStyle(fontSize: 10.sp, color: purpleRoomNo, fontWeight: FontWeight.w600)),
                   ],
                 ),
                 // First rep name + ...N More (tappable) + Room number
@@ -538,7 +490,7 @@ class DashboardView extends StatelessWidget {
                               onTap: () => context.read<DashboardCubit>().toggleMeetingReps(slotIndex, meetingIndex),
                               child: Text(
                                 '...$extraCount More',
-                                style: TextStyle(fontSize: 11.sp, color: Colors.grey[500]),
+                                style: TextStyle(fontSize: 11.sp, color: Colors.black),
                               ),
                             ),
                           ],
@@ -561,7 +513,7 @@ class DashboardView extends StatelessWidget {
                       children: [
                         Text(
                           fund.fundName,
-                          style: TextStyle(fontSize: 12.sp, color: Colors.blue[700], fontWeight: FontWeight.w500),
+                          style: TextStyle(fontSize: 12.sp, color: blueFundName, fontWeight: FontWeight.w500),
                         ),
                         SizedBox(height: 2.h),
                         ...fund.clientNames.map((name) => Padding(

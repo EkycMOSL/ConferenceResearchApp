@@ -84,3 +84,9 @@ flutter:
     - lib/imageAssets/motilallogo.png
     - lib/imageAssets/investorlogo.png
     - lib/imageAssets/ic_loader.json
+    - lib/imageAssets/ic_1x1.png
+    - lib/imageAssets/ic_2x1.png
+    - lib/imageAssets/ic_3x1.png
+    - lib/imageAssets/ic_4x1.png
+    - lib/imageAssets/ic_group.png
+    - lib/imageAssets/ic_mtrack.png

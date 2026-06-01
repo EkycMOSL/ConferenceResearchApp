@@ -26,3 +26,10 @@ const Color LmTextLabelColor =  Color(0xff414141);
 Color litegrey = const Color(0xFF717171);
 Color darkGrey = const Color(0x66666666);
 const Color colorGreen=Color(0xff008743);
+
+const Color lightBlueCompanyName = Color(0xff0091ea);
+const Color blackRepName = Color(0xff323232);
+const Color blueOneMore = Color(0xff005DAC);
+const Color purpleRoomNo = Color(0xFF9C27B0);
+const Color blueFundName = Color(0xff2C2A95);
+const Color orangeListItem = Color(0xFFeb6400);
