@@ -87,7 +87,7 @@ class DashboardView extends StatelessWidget {
         children: [
           Text(
             'CONFERENCE RESEARCH APP',
-            style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold, color: Colors.blue),
+            style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold, color: _darkBlue),
           ),
           Builder(
             builder: (context) => GestureDetector(
@@ -122,7 +122,7 @@ class DashboardView extends StatelessWidget {
                 decoration: BoxDecoration(
                   border: Border(
                     bottom: BorderSide(
-                      color: isSelected ? Colors.blue : Colors.transparent,
+                      color: isSelected ? _darkBlue : Colors.transparent,
                       width: 3,
                     ),
                   ),
@@ -133,7 +133,7 @@ class DashboardView extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 14.sp,
                     fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                    color: isSelected ? Colors.blue : Colors.grey[600],
+                    color: isSelected ? _darkBlue : Colors.grey[600],
                   ),
                 ),
               ),
@@ -316,7 +316,7 @@ class DashboardView extends StatelessWidget {
           ),
           child: Text(
             slot.time,
-            style: TextStyle(fontSize: 12.sp, color: Colors.orange, fontWeight: FontWeight.w600),
+            style: TextStyle(fontSize: 16.sp, color: Colors.orange, fontWeight: FontWeight.w600),
           ),
         ),
         ...slot.entries.asMap().entries.map((eEntry) {
@@ -332,10 +332,19 @@ class DashboardView extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Avatar + label
-                Image.asset(
-                  _getMeetingIcon(entry.natureOfMeeting),
-                  width: 36.w,
-                  height: 36.h,
+                SizedBox(
+                  width: 40.w,
+                  height: 40.h,
+                  child: ClipRect(
+                    child: Align(
+                      alignment: Alignment.topCenter,
+                      heightFactor: 0.28,
+                      child: Image.asset(
+                        _getMeetingIcon(entry.natureOfMeeting),
+                       fit: BoxFit.fitWidth,
+                      ),
+                    ),
+                  ),
                 ),
                 SizedBox(width: 10.w),
                 Expanded(
@@ -350,7 +359,7 @@ class DashboardView extends StatelessWidget {
                             child: Text(
                               corporateName.toUpperCase(),
                               style: TextStyle(
-                                fontSize: 13.sp,
+                                fontSize: 16.sp,
                                 color: lightBlueCompanyName,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -358,7 +367,7 @@ class DashboardView extends StatelessWidget {
                           ),
                           Text(
                             'Room No',
-                            style: TextStyle(fontSize: 10.sp, color: purpleRoomNo, fontWeight: FontWeight.w600),
+                            style: TextStyle(fontSize: 12.sp, color: purpleRoomNo, fontWeight: FontWeight.w600),
                           ),
                         ],
                       ),
@@ -370,7 +379,7 @@ class DashboardView extends StatelessWidget {
                               children: [
                                 Text(
                                   entry.contactPerson,
-                                  style: TextStyle(fontSize: 12.sp, color: Colors.black87),
+                                  style: TextStyle(fontSize: 14.sp, color: Colors.black87),
                                 ),
                                 if (extraCount > 0) ...[
                                   SizedBox(width: 6.w),
@@ -378,8 +387,8 @@ class DashboardView extends StatelessWidget {
                                     onTap: () => context.read<DashboardCubit>().toggleCorporateMeetingReps(
                                           slotIndex, timeSlotIndex, entryIndex),
                                     child: Text(
-                                      '...$extraCount More',
-                                      style: TextStyle(fontSize: 11.sp, color: Colors.black),
+                                      entry.isRepsExpanded ? '...Hide' : '...$extraCount More',
+                                      style: TextStyle(fontSize: 12.sp, color: Colors.black),
                                     ),
                                   ),
                                 ],
@@ -388,7 +397,7 @@ class DashboardView extends StatelessWidget {
                           ),
                           Text(
                             entry.roomNo,
-                            style: TextStyle(fontSize: 13.sp, color: Colors.black, fontWeight: FontWeight.bold),
+                            style: TextStyle(fontSize: 15.sp, color: Colors.black, fontWeight: FontWeight.bold),
                           ),
                         ],
                       ),
@@ -406,7 +415,7 @@ class DashboardView extends StatelessWidget {
                               Text(
                                 fund.fundName,
                                 style: TextStyle(
-                                  fontSize: 12.sp,
+                                  fontSize: 14.sp,
                                   color: blueFundName,
                                   fontWeight: FontWeight.w500,
                                 ),
@@ -414,7 +423,7 @@ class DashboardView extends StatelessWidget {
                               SizedBox(height: 2.h),
                               ...fund.clientNames.map((name) => Padding(
                                     padding: EdgeInsets.only(bottom: 2.h),
-                                    child: Text(name, style: TextStyle(fontSize: 12.sp, color: Colors.black87)),
+                                    child: Text(name, style: TextStyle(fontSize: 14.sp, color: Colors.black87)),
                                   )),
                               SizedBox(height: 4.h),
                             ],
@@ -453,10 +462,19 @@ class DashboardView extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Left: avatar icon
-          Image.asset(
-            _getMeetingIcon(meeting.natureOfMeeting),
-             width: 36.w,
-             height: 36.h,
+          SizedBox(
+            width: 40.w,
+            height: 40.h,
+            child: ClipRect(
+              child: Align(
+                alignment: Alignment.topCenter,
+                heightFactor: 0.28,
+                child: Image.asset(
+                  _getMeetingIcon(meeting.natureOfMeeting),
+                  fit: BoxFit.fitWidth,
+                ),
+              ),
+            ),
           ),
           SizedBox(width: 10.w),
           // Right content
@@ -471,10 +489,10 @@ class DashboardView extends StatelessWidget {
                     Expanded(
                       child: Text(
                         meeting.companyName.toUpperCase(),
-                        style: TextStyle(fontSize: 13.sp, color: lightBlueCompanyName, fontWeight: FontWeight.bold),
+                        style: TextStyle(fontSize: 16.sp, color: lightBlueCompanyName, fontWeight: FontWeight.bold),
                       ),
                     ),
-                    Text('Room No', style: TextStyle(fontSize: 10.sp, color: purpleRoomNo, fontWeight: FontWeight.w600)),
+                    Text('Room No', style: TextStyle(fontSize: 12.sp, color: purpleRoomNo, fontWeight: FontWeight.w600)),
                   ],
                 ),
                 // First rep name + ...N More (tappable) + Room number
@@ -483,21 +501,21 @@ class DashboardView extends StatelessWidget {
                     Expanded(
                       child: Row(
                         children: [
-                          Text(meeting.contactPerson, style: TextStyle(fontSize: 12.sp, color: Colors.black87)),
+                          Text(meeting.contactPerson, style: TextStyle(fontSize: 14.sp, color: Colors.black87)),
                           if (extraCount > 0) ...[
                             SizedBox(width: 6.w),
                             GestureDetector(
                               onTap: () => context.read<DashboardCubit>().toggleMeetingReps(slotIndex, meetingIndex),
                               child: Text(
-                                '...$extraCount More',
-                                style: TextStyle(fontSize: 11.sp, color: Colors.black),
+                                meeting.isRepsExpanded ? '...Hide' : '...$extraCount More',
+                                style: TextStyle(fontSize: 14.sp, color: Colors.black),
                               ),
                             ),
                           ],
                         ],
                       ),
                     ),
-                    Text(meeting.roomNo, style: TextStyle(fontSize: 13.sp, color: Colors.black, fontWeight: FontWeight.bold)),
+                    Text(meeting.roomNo, style: TextStyle(fontSize: 15.sp, color: Colors.black, fontWeight: FontWeight.bold)),
                   ],
                 ),
                 // Expanded reps (all except first)
@@ -513,12 +531,12 @@ class DashboardView extends StatelessWidget {
                       children: [
                         Text(
                           fund.fundName,
-                          style: TextStyle(fontSize: 12.sp, color: blueFundName, fontWeight: FontWeight.w500),
+                          style: TextStyle(fontSize: 14.sp, color: blueFundName, fontWeight: FontWeight.w500),
                         ),
                         SizedBox(height: 2.h),
                         ...fund.clientNames.map((name) => Padding(
                               padding: EdgeInsets.only(bottom: 2.h),
-                              child: Text(name, style: TextStyle(fontSize: 12.sp, color: Colors.black87)),
+                              child: Text(name, style: TextStyle(fontSize: 14.sp, color: Colors.black87)),
                             )),
                         SizedBox(height: 4.h),
                       ],
@@ -542,7 +560,7 @@ class DashboardView extends StatelessWidget {
               child: Container(
                 padding: EdgeInsets.symmetric(vertical: 10.h),
                 decoration: BoxDecoration(
-                  color: state.selectedBottomIndex == 0 ? Colors.blue : Colors.transparent,
+                  color: state.selectedBottomIndex == 0 ? _darkBlue : Colors.transparent,
                 ),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -565,7 +583,7 @@ class DashboardView extends StatelessWidget {
               child: Container(
                 padding: EdgeInsets.symmetric(vertical: 10.h),
                 decoration: BoxDecoration(
-                  color: state.selectedBottomIndex == 1 ? Colors.blue : Colors.transparent,
+                  color: state.selectedBottomIndex == 1 ? _darkBlue : Colors.transparent,
                 ),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,

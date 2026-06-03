@@ -97,7 +97,10 @@ class DashboardCubit extends Cubit<DashboardState> {
   }
 
   List<CorporateMeetingEntry> _buildCorporateEntries(List<MeetingItem> items) {
-    // Group by fund name
+    if (items.isEmpty) return [];
+    final first = items.first;
+    final reps = first.reps;
+
     final Map<String, List<MeetingItem>> byFund = {};
     for (final item in items) {
       byFund.putIfAbsent(item.fundName, () => []).add(item);
@@ -108,8 +111,6 @@ class DashboardCubit extends Cubit<DashboardState> {
       reps: e.value.first.reps,
     )).toList();
 
-    final first = items.first;
-    final reps = first.reps;
     return [
       CorporateMeetingEntry(
         roomNo: first.roomNo,
