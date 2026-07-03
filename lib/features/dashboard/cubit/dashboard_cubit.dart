@@ -108,6 +108,7 @@ class DashboardCubit extends Cubit<DashboardState> {
     final fundGroups = byFund.entries.map((e) => FundGroup(
       fundName: e.key,
       clientNames: e.value.map((i) => i.clientName).toList(),
+      attendedFlags: e.value.map((i) => i.isAttended).toList(),
       reps: e.value.first.reps,
     )).toList();
 

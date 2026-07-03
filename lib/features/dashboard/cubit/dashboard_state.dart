@@ -182,16 +182,18 @@ class TimeSlot extends Equatable {
 class FundGroup extends Equatable {
   final String fundName;
   final List<String> clientNames;
+  final List<bool> attendedFlags;
   final List<RepresentativeModel> reps;
 
   const FundGroup({
     required this.fundName,
     required this.clientNames,
+    this.attendedFlags = const [],
     this.reps = const [],
   });
 
   @override
-  List<Object?> get props => [fundName, clientNames, reps];
+  List<Object?> get props => [fundName, clientNames, attendedFlags, reps];
 }
 
 class Meeting extends Equatable {

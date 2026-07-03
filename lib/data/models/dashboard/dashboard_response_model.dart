@@ -82,6 +82,7 @@ class MeetingItem {
   final String natureOfMeeting;
   final List<RepresentativeModel> reps;
   final String meetingLastModified;
+  final bool isAttended;
 
   const MeetingItem({
     required this.empCode,
@@ -98,6 +99,7 @@ class MeetingItem {
     required this.natureOfMeeting,
     required this.reps,
     required this.meetingLastModified,
+    required this.isAttended,
   });
 
   factory MeetingItem.fromJson(Map<String, dynamic> json) {
@@ -117,6 +119,7 @@ class MeetingItem {
       natureOfMeeting: json['Nature_of_meeting'] ?? '',
       reps: repList.map((e) => RepresentativeModel.fromJson(e)).toList(),
       meetingLastModified: json['MeetingLastModified'] ?? '',
+      isAttended: json['IsAttended'] == true || json['IsAttended']?.toString().toLowerCase() == 'true'
     );
   }
 }

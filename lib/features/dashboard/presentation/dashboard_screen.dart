@@ -314,9 +314,40 @@ class DashboardView extends StatelessWidget {
           decoration: BoxDecoration(
             border: Border(top: BorderSide(color: Colors.grey[200]!, width: 1)),
           ),
-          child: Text(
-            slot.time,
-            style: TextStyle(fontSize: 16.sp, color: Colors.orange, fontWeight: FontWeight.w600),
+          child: Row(
+            children: [
+              Expanded(
+                child: Text(
+                  slot.time,
+                  style: TextStyle(fontSize: 16.sp, color: Colors.orange, fontWeight: FontWeight.w600),
+                ),
+              ),
+              ...slot.entries.map((entry) {
+                final total = entry.fundGroups.fold(0, (sum, f) => sum + f.clientNames.length);
+                final attended = entry.fundGroups.fold(0, (sum, f) => sum + f.attendedFlags.where((a) => a).length);
+                return Row(
+                  children: [
+                    Text('T', style: TextStyle(fontSize: 13.sp, color: Colors.black, fontWeight: FontWeight.bold)),
+                    SizedBox(width: 4.w),
+                    Container(
+                      width: 24.w,
+                      height: 24.w,
+                      decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: Colors.black, width: 1.5)),
+                      child: Center(child: Text('$total', style: TextStyle(fontSize: 12.sp, color: Colors.black, fontWeight: FontWeight.bold))),
+                    ),
+                    SizedBox(width: 8.w),
+                    Text('A', style: TextStyle(fontSize: 13.sp, color: Colors.black, fontWeight: FontWeight.bold)),
+                    SizedBox(width: 4.w),
+                    Container(
+                      width: 24.w,
+                      height: 24.w,
+                      decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: Colors.black, width: 1.5)),
+                      child: Center(child: Text('$attended', style: TextStyle(fontSize: 12.sp, color: Colors.black, fontWeight: FontWeight.bold))),
+                    ),
+                  ],
+                );
+              }),
+            ],
           ),
         ),
         ...slot.entries.asMap().entries.map((eEntry) {
@@ -421,9 +452,20 @@ class DashboardView extends StatelessWidget {
                                 ),
                               ),
                               SizedBox(height: 2.h),
-                              ...fund.clientNames.map((name) => Padding(
+                              ...fund.clientNames.asMap().entries.map((e) => Padding(
                                     padding: EdgeInsets.only(bottom: 2.h),
-                                    child: Text(name, style: TextStyle(fontSize: 14.sp, color: Colors.black87)),
+                                    child: Text(
+                                      e.value,
+                                      style: TextStyle(
+                                        fontSize: 14.sp,
+                                        color: (e.key < fund.attendedFlags.length && fund.attendedFlags[e.key])
+                                            ? Colors.green[800]
+                                            : Colors.black87,
+                                        fontWeight: (e.key < fund.attendedFlags.length && fund.attendedFlags[e.key])
+                                            ? FontWeight.w600
+                                            : FontWeight.normal,
+                                      ),
+                                    ),
                                   )),
                               SizedBox(height: 4.h),
                             ],

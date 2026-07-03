@@ -35,7 +35,9 @@ class SplashCubit extends Cubit<SplashState> {
           return;
         }
       }
-    } catch (_) {}
+    } catch (e, st) {
+      print('SplashCubit error: $e\n$st');
+    }
 
     emit(const SplashNavigateToLogin());
   }
