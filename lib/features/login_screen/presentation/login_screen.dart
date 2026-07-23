@@ -5,6 +5,7 @@ import 'package:conferance_application/features/dashboard/presentation/dashboard
 import 'package:conferance_application/features/login_screen/cubit/login_screen_cubit.dart';
 import 'package:conferance_application/features/login_screen/cubit/login_screen_state.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:loader_overlay/loader_overlay.dart';
@@ -13,8 +14,7 @@ import 'package:back_button_interceptor/back_button_interceptor.dart';
 
 import '../../../utils/locator.dart';
 
-const Color _darkBlue = Color(0xFF2B2E8C);
-const Color _gold = Color(0xFFFFC107);
+const Color _darkBlue = Color(0xFF1A1F8F);
 
 class LoginScreenScreen extends StatelessWidget {
   const LoginScreenScreen({super.key});
@@ -51,7 +51,6 @@ class _LoginScreenViewState extends State<LoginScreenView> {
   void initState() {
     super.initState();
     BackButtonInterceptor.add(backInterceptor, context: context);
-
   }
 
   @override
@@ -103,93 +102,94 @@ class _LoginScreenViewState extends State<LoginScreenView> {
         },
         builder: (context, state) {
           return SafeArea(
-            child: SingleChildScrollView(
-              padding: EdgeInsets.symmetric(horizontal: 24.w),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  SizedBox(height: 40.h),
-
-                  // Motilal Oswal logo
-                  Image.asset(
-                    AssetsPath.motilalLogo,
-                    height: 80.h,
+            child: Column(
+              children: [
+                // ── Top logo (full width, stretch to remove inner padding) ──
+                SizedBox(
+                  width: double.infinity,
+                  height: 140.h,
+                  child: Image.asset(
+                    AssetsPath.top_icon,
+                    fit: BoxFit.fill,
                   ),
+                ),
 
-                  SizedBox(height: 48.h),
 
-                  // 21st Annual Global Investor Conference logo
-                  Image.asset(
-                    AssetsPath.investorLogo,
-                    height: 200.h,
+                // ── Middle 22nd circle logo ──
+                Image.asset(
+                  AssetsPath.middle_icon,
+                  height: 140.h,
+                  fit: BoxFit.contain,
+                ),
+
+
+                // ── "Annual Global Investor Conference" text ──
+                Text(
+                  'Annual Global\nInvestor Conference',
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.tinos(
+                    color: _darkBlue,
+                    fontSize: 28.sp,
+                    fontWeight: FontWeight.bold,
+                    height: 1.3,
                   ),
+                ),
 
-                  SizedBox(height: 16.h),
 
-                  // Date & Venue pill
-                  Container(
+                // ── India Ahead logo ──
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 48.w),
+                  child: Image.asset(
+                    AssetsPath.india_icon,
                     width: double.infinity,
-                    padding: EdgeInsets.symmetric(vertical: 14.h),
-                    decoration: BoxDecoration(
-                      color: _darkBlue,
-                      borderRadius: BorderRadius.circular(30.r),
-                    ),
-                    child: Column(
-                      children: [
-                        Text(
-                          '1st Sept – 5th Sept, 2025',
-                          style: TextStyle(
-                            color: colorwhite,
-                            fontSize: 16.sp,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Text(
-                          'Grand Hyatt, Mumbai',
-                          style: TextStyle(
-                            color: colorwhite,
-                            fontSize: 13.sp,
-                          ),
-                        ),
-                      ],
-                    ),
+                    fit: BoxFit.contain,
                   ),
+                ),
 
-                  SizedBox(height: 40.h),
+                const Spacer(),
 
-                  // 5 Digit Id text field
-                  TextField(
+                // ── 5 Digit ID text field ──
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 50.w),
+                  child: TextField(
                     controller: _idController,
                     keyboardType: TextInputType.number,
                     maxLength: 5,
                     textAlign: TextAlign.center,
+                    style: TextStyle(color: colortextHint, fontSize: 16.sp),
                     decoration: InputDecoration(
-                      hintText: '5 Digit Id',
+                      hintText: '5 Digit ID',
                       hintStyle:
-                          TextStyle(color: colortextHint, fontSize: 14.sp),
+                          TextStyle(color: colortextHint, fontSize: 16.sp),
                       counterText: '',
-                      contentPadding: EdgeInsets.symmetric(vertical: 14.h),
+                      contentPadding: EdgeInsets.symmetric(vertical: 12.h),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(30.r),
-                        borderSide: BorderSide(color: colortextHint),
+                        borderSide:
+                            BorderSide(color: colortextHint, width: 1.2),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(30.r),
-                        borderSide: const BorderSide(color: _darkBlue),
+                        borderSide:
+                            const BorderSide(color: _darkBlue, width: 1.5),
                       ),
                     ),
                   ),
+                ),
 
-                  SizedBox(height: 16.h),
+                SizedBox(height: 12.h),
 
-                  // Login button
-                  SizedBox(
+                // ── Login button ──
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 50.w),
+                  child: SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: () {
                         if (_idController.text.trim().isEmpty) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Please enter your 5 digit ID')),
+                            const SnackBar(
+                                content: Text('Please enter your 5 digit ID')),
                           );
                           return;
                         }
@@ -199,37 +199,39 @@ class _LoginScreenViewState extends State<LoginScreenView> {
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: _darkBlue,
-                        padding: EdgeInsets.symmetric(vertical: 14.h),
+                        padding: EdgeInsets.symmetric(vertical: 12.h),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30.r),
                         ),
+                        elevation: 0,
                       ),
                       child: Text(
                         'Login',
                         style: TextStyle(
                           color: colorwhite,
-                          fontSize: 16.sp,
+                          fontSize: 18.sp,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
                   ),
+                ),
 
-                  SizedBox(height: 16.h),
+                SizedBox(height: 14.h),
 
-                  // Access note
-                  Text(
-                    'Access permitted to registered\nusers only',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: colorblue,
-                      fontSize: 13.sp,
-                    ),
+                // ── Access note ──
+                Text(
+                  'Access permitted to registered\nusers only',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: _darkBlue,
+                    fontSize: 16.sp,
+                    fontWeight: FontWeight.bold,
                   ),
+                ),
 
-                  SizedBox(height: 24.h),
-                ],
-              ),
+                SizedBox(height: 20.h),
+              ],
             ),
           );
         },

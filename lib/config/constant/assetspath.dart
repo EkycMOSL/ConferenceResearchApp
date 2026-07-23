@@ -12,4 +12,7 @@ class AssetsPath {
    static const String four_in_one = 'lib/imageAssets/ic_4x1.png';
    static const String group_icon = 'lib/imageAssets/ic_group.png';
    static const String mtrack_icon = 'lib/imageAssets/ic_mtrack.png';
+   static const String top_icon = 'lib/imageAssets/top_logo.jpg';
+   static const String middle_icon = 'lib/imageAssets/middle_22_logo.jpg';
+   static const String india_icon = 'lib/imageAssets/india_ahead.jpg';
 }

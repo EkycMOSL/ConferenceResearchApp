@@ -90,3 +90,6 @@ flutter:
     - lib/imageAssets/ic_4x1.png
     - lib/imageAssets/ic_group.png
     - lib/imageAssets/ic_mtrack.png
+    - lib/imageAssets/top_logo.jpg
+    - lib/imageAssets/middle_22_logo.jpg
+    - lib/imageAssets/india_ahead.jpg
