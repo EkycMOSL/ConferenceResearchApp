@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 const Color _darkBlue = Color(0xFF2B2E8C);
 
@@ -69,50 +70,49 @@ class _SplashViewState extends State<SplashView> {
       },
       child: Scaffold(
         backgroundColor: colorwhite,
-        body: SafeArea(
+        body:
+        SafeArea(
           child: Column(
             children: [
-              const Spacer(),
+              // ── Top logo (full width, stretch to remove inner padding) ──
+              SizedBox(
+                width: double.infinity,
+                height: 140.h,
+                child: Image.asset(
+                  AssetsPath.top_icon,
+                  fit: BoxFit.fill,
+                ),
+              ),
 
-              // Investor logo (21st circle)
+
+              // ── Middle 22nd circle logo ──
               Image.asset(
-                AssetsPath.investorLogo,
-                width: 220.w,
-                height: 220.h,
+                AssetsPath.middle_icon,
+                height: 140.h,
                 fit: BoxFit.contain,
               ),
 
-              SizedBox(height: 16.h),
 
-              // Date & Venue pill
+              // ── "Annual Global Investor Conference" text ──
+              Text(
+                'Annual Global\nInvestor Conference',
+                textAlign: TextAlign.center,
+                style: GoogleFonts.tinos(
+                  color: _darkBlue,
+                  fontSize: 28.sp,
+                  fontWeight: FontWeight.bold,
+                  height: 1.3,
+                ),
+              ),
+
+
+              // ── India Ahead logo ──
               Padding(
-                padding: EdgeInsets.symmetric(horizontal: 24.w),
-                child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 48.w),
+                child: Image.asset(
+                  AssetsPath.india_icon,
                   width: double.infinity,
-                  padding: EdgeInsets.symmetric(vertical: 14.h),
-                  decoration: BoxDecoration(
-                    color: _darkBlue,
-                    borderRadius: BorderRadius.circular(30.r),
-                  ),
-                  child: Column(
-                    children: [
-                      Text(
-                        '1st Sept – 5th Sept, 2025',
-                        style: TextStyle(
-                          color: colorwhite,
-                          fontSize: 16.sp,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Text(
-                        'Grand Hyatt, Mumbai',
-                        style: TextStyle(
-                          color: colorwhite,
-                          fontSize: 13.sp,
-                        ),
-                      ),
-                    ],
-                  ),
+                  fit: BoxFit.contain,
                 ),
               ),
 
@@ -129,9 +129,12 @@ class _SplashViewState extends State<SplashView> {
               ),
 
               SizedBox(height: 24.h),
+
+
             ],
           ),
         ),
+
       ),
     );
   }
