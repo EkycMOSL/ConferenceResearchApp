@@ -77,6 +77,7 @@ class _LoginScreenViewState extends State<LoginScreenView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       backgroundColor: colorwhite,
       body: BlocConsumer<LoginScreenCubit, LoginScreenState>(
         listener: (context, state) {
@@ -101,137 +102,140 @@ class _LoginScreenViewState extends State<LoginScreenView> {
           }
         },
         builder: (context, state) {
-          return SafeArea(
-            child: Column(
-              children: [
-                // ── Top logo (full width, stretch to remove inner padding) ──
-                SizedBox(
-                  width: double.infinity,
-                  height: 140.h,
-                  child: Image.asset(
-                    AssetsPath.top_icon,
-                    fit: BoxFit.fill,
-                  ),
-                ),
-
-
-                // ── Middle 22nd circle logo ──
-                Image.asset(
-                  AssetsPath.middle_icon,
-                  height: 140.h,
-                  fit: BoxFit.contain,
-                ),
-
-
-                // ── "Annual Global Investor Conference" text ──
-                Text(
-                  'Annual Global\nInvestor Conference',
-                  textAlign: TextAlign.center,
-                  style: GoogleFonts.tinos(
-                    color: _darkBlue,
-                    fontSize: 28.sp,
-                    fontWeight: FontWeight.bold,
-                    height: 1.3,
-                  ),
-                ),
-
-
-                // ── India Ahead logo ──
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 48.w),
-                  child: Image.asset(
-                    AssetsPath.india_icon,
+          return
+            SafeArea(
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  // ── Top logo (full width, stretch to remove inner padding) ──
+                  SizedBox(
                     width: double.infinity,
+                    height: 140.h,
+                    child: Image.asset(
+                      AssetsPath.top_icon,
+                      fit: BoxFit.fill,
+                    ),
+                  ),
+
+
+                  // ── Middle 22nd circle logo ──
+                  Image.asset(
+                    AssetsPath.middle_icon,
+                    height: 140.h,
                     fit: BoxFit.contain,
                   ),
-                ),
 
-                const Spacer(),
 
-                // ── 5 Digit ID text field ──
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 50.w),
-                  child: TextField(
-                    controller: _idController,
-                    keyboardType: TextInputType.number,
-                    maxLength: 5,
+                  // ── "Annual Global Investor Conference" text ──
+                  Text(
+                    'Annual Global\nInvestor Conference',
                     textAlign: TextAlign.center,
-                    style: TextStyle(color: colortextHint, fontSize: 16.sp),
-                    decoration: InputDecoration(
-                      hintText: '5 Digit ID',
-                      hintStyle:
-                          TextStyle(color: colortextHint, fontSize: 16.sp),
-                      counterText: '',
-                      contentPadding: EdgeInsets.symmetric(vertical: 12.h),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(30.r),
-                        borderSide:
-                            BorderSide(color: colortextHint, width: 1.2),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(30.r),
-                        borderSide:
-                            const BorderSide(color: _darkBlue, width: 1.5),
-                      ),
+                    style: GoogleFonts.tinos(
+                      color: _darkBlue,
+                      fontSize: 28.sp,
+                      fontWeight: FontWeight.bold,
+                      height: 1.3,
                     ),
                   ),
-                ),
 
-                SizedBox(height: 12.h),
 
-                // ── Login button ──
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 50.w),
-                  child: SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        if (_idController.text.trim().isEmpty) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                                content: Text('Please enter your 5 digit ID')),
-                          );
-                          return;
-                        }
-                        objLoginScreenCubit.getDashboardData(
-                          clientCode: _idController.text.trim(),
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: _darkBlue,
-                        padding: EdgeInsets.symmetric(vertical: 12.h),
-                        shape: RoundedRectangleBorder(
+                  // ── India Ahead logo ──
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 48.w),
+                    child: Image.asset(
+                      AssetsPath.india_icon,
+                      width: double.infinity,
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+
+                  SizedBox(height: 20.h),
+
+                  // ── 5 Digit ID text field ──
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 50.w),
+                    child: TextField(
+                      controller: _idController,
+                      keyboardType: TextInputType.number,
+                      maxLength: 5,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: colortextHint, fontSize: 16.sp),
+                      decoration: InputDecoration(
+                        hintText: '5 Digit ID',
+                        hintStyle:
+                            TextStyle(color: colortextHint, fontSize: 16.sp),
+                        counterText: '',
+                        contentPadding: EdgeInsets.symmetric(vertical: 12.h),
+                        enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(30.r),
+                          borderSide:
+                              BorderSide(color: colortextHint, width: 1.2),
                         ),
-                        elevation: 0,
-                      ),
-                      child: Text(
-                        'Login',
-                        style: TextStyle(
-                          color: colorwhite,
-                          fontSize: 18.sp,
-                          fontWeight: FontWeight.bold,
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30.r),
+                          borderSide:
+                              const BorderSide(color: _darkBlue, width: 1.5),
                         ),
                       ),
                     ),
                   ),
-                ),
 
-                SizedBox(height: 14.h),
+                  SizedBox(height: 12.h),
 
-                // ── Access note ──
-                Text(
-                  'Access permitted to registered\nusers only',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: _darkBlue,
-                    fontSize: 16.sp,
-                    fontWeight: FontWeight.bold,
+                  // ── Login button ──
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 50.w),
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          if (_idController.text.trim().isEmpty) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  content: Text('Please enter your 5 digit ID')),
+                            );
+                            return;
+                          }
+                          objLoginScreenCubit.getDashboardData(
+                            clientCode: _idController.text.trim(),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: _darkBlue,
+                          padding: EdgeInsets.symmetric(vertical: 12.h),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30.r),
+                          ),
+                          elevation: 0,
+                        ),
+                        child: Text(
+                          'Login',
+                          style: TextStyle(
+                            color: colorwhite,
+                            fontSize: 18.sp,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
                   ),
-                ),
 
-                SizedBox(height: 20.h),
-              ],
+                  SizedBox(height: 14.h),
+
+                  // ── Access note ──
+                  Text(
+                    'Access permitted to registered\nusers only',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: _darkBlue,
+                      fontSize: 16.sp,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+
+                  SizedBox(height: 20.h),
+                ],
+              ),
             ),
           );
         },
