@@ -58,7 +58,7 @@ class DashboardView extends StatelessWidget {
           if (state is DashboardLoaded) {
             return Column(
               children: [
-                _buildHeader(),
+                _buildHeader(state.agicMeetings.first.meetingSlots.first.meetings.first.name ?? ''),
                 _buildDayTabs(context, state),
                 Expanded(
                   child: state.selectedBottomIndex == 0
@@ -78,7 +78,7 @@ class DashboardView extends StatelessWidget {
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(String title) {
     return Container(
       padding: EdgeInsets.only(top: 50.h, left: 16.w, right: 16.w, bottom: 16.h),
       color: Colors.grey[300],
@@ -86,7 +86,7 @@ class DashboardView extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
-            'CONFERENCE RESEARCH APP',
+            title,
             style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold, color: _darkBlue),
           ),
           Builder(
