@@ -156,7 +156,7 @@ class _LoginScreenViewState extends State<LoginScreenView> {
                     padding: EdgeInsets.symmetric(horizontal: 50.w),
                     child: TextField(
                       controller: _idController,
-                      keyboardType: TextInputType.number,
+                      keyboardType: TextInputType.text,
                       maxLength: 5,
                       textAlign: TextAlign.center,
                       style: TextStyle(color: colortextHint, fontSize: 16.sp),
